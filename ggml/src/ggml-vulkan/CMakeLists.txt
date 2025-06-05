@@ -155,10 +155,10 @@ if (Vulkan_FOUND)
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vulkan-shaders
         CMAKE_ARGS ${VULKAN_SHADER_GEN_CMAKE_ARGS}
         BUILD_COMMAND ${CMAKE_COMMAND} --build . ${VULKAN_SHADER_GEN_CMAKE_BUILD_ARGS}
-        INSTALL_COMMAND ${CMAKE_COMMAND} --install .
+        INSTALL_COMMAND ""  # Skip install step since binary is already in correct location
         INSTALL_DIR ${CMAKE_BINARY_DIR}
     )
-    ExternalProject_Add_StepTargets(vulkan-shaders-gen build install)
+    ExternalProject_Add_StepTargets(vulkan-shaders-gen build)
 
     set (_ggml_vk_host_suffix $<IF:$<STREQUAL:${CMAKE_HOST_SYSTEM_NAME},Windows>,.exe,>)
     set (_ggml_vk_genshaders_cmd ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/vulkan-shaders-gen${_ggml_vk_host_suffix})
@@ -170,8 +170,8 @@ if (Vulkan_FOUND)
     file(GLOB _ggml_vk_shader_deps "${_ggml_vk_input_dir}/*.comp")
     set (_ggml_vk_shader_deps ${_ggml_vk_shader_deps} vulkan-shaders-gen)
 
-    # Add build and install dependencies for all builds
-    set(_ggml_vk_shader_deps ${_ggml_vk_shader_deps} vulkan-shaders-gen-build vulkan-shaders-gen-install)
+    # Add build dependency (no install step needed)
+    set(_ggml_vk_shader_deps ${_ggml_vk_shader_deps} vulkan-shaders-gen-build)
 
     add_custom_command(
         OUTPUT ${_ggml_vk_header}
