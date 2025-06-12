@@ -158,7 +158,13 @@ if (Vulkan_FOUND)
     ExternalProject_Add_StepTargets(vulkan-shaders-gen build install)
 
     set (_ggml_vk_host_suffix $<IF:$<STREQUAL:${CMAKE_HOST_SYSTEM_NAME},Windows>,.exe,>)
-    set (_ggml_vk_genshaders_cmd ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/vulkan-shaders-gen${_ggml_vk_host_suffix})
+    
+    # Handle multi-config generators (like Visual Studio) which create config subdirectories
+    if(CMAKE_GENERATOR MATCHES "Visual Studio" OR CMAKE_GENERATOR MATCHES "Ninja Multi-Config" OR CMAKE_GENERATOR MATCHES "Xcode")
+        set (_ggml_vk_genshaders_cmd ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/vulkan-shaders-gen${_ggml_vk_host_suffix})
+    else()
+        set (_ggml_vk_genshaders_cmd ${CMAKE_BINARY_DIR}/bin/vulkan-shaders-gen${_ggml_vk_host_suffix})
+    endif()
     set (_ggml_vk_header     ${CMAKE_CURRENT_BINARY_DIR}/ggml-vulkan-shaders.hpp)
     set (_ggml_vk_source     ${CMAKE_CURRENT_BINARY_DIR}/ggml-vulkan-shaders.cpp)
     set (_ggml_vk_input_dir  ${CMAKE_CURRENT_SOURCE_DIR}/vulkan-shaders)
