@@ -94,6 +94,9 @@ namespace console {
                 simple_io = true;
             }
         }
+        if (simple_io) {
+            _setmode(_fileno(stdin), _O_U8TEXT);
+        }
 #else
         // POSIX-specific console initialization
         if (!simple_io) {
@@ -158,7 +161,7 @@ namespace console {
         }
     }
 
-    char32_t getchar32() {
+    static char32_t getchar32() {
 #if defined(_WIN32)
         HANDLE hConsole = GetStdHandle(STD_INPUT_HANDLE);
         wchar_t high_surrogate = 0;
@@ -212,7 +215,7 @@ namespace console {
 #endif
     }
 
-    void pop_cursor() {
+    static void pop_cursor() {
 #if defined(_WIN32)
         if (hConsole != NULL) {
             CONSOLE_SCREEN_BUFFER_INFO bufferInfo;
@@ -233,7 +236,7 @@ namespace console {
         putc('\b', out);
     }
 
-    int estimateWidth(char32_t codepoint) {
+    static int estimateWidth(char32_t codepoint) {
 #if defined(_WIN32)
         (void)codepoint;
         return 1;
@@ -242,7 +245,7 @@ namespace console {
 #endif
     }
 
-    int put_codepoint(const char* utf8_codepoint, size_t length, int expectedWidth) {
+    static int put_codepoint(const char* utf8_codepoint, size_t length, int expectedWidth) {
 #if defined(_WIN32)
         CONSOLE_SCREEN_BUFFER_INFO bufferInfo;
         if (!GetConsoleScreenBufferInfo(hConsole, &bufferInfo)) {
@@ -303,7 +306,7 @@ namespace console {
 #endif
     }
 
-    void replace_last(char ch) {
+    static void replace_last(char ch) {
 #if defined(_WIN32)
         pop_cursor();
         put_codepoint(&ch, 1, 1);
@@ -312,7 +315,7 @@ namespace console {
 #endif
     }
 
-    void append_utf8(char32_t ch, std::string & out) {
+    static void append_utf8(char32_t ch, std::string & out) {
         if (ch <= 0x7F) {
             out.push_back(static_cast<unsigned char>(ch));
         } else if (ch <= 0x7FF) {
@@ -333,7 +336,7 @@ namespace console {
     }
 
     // Helper function to remove the last UTF-8 character from a string
-    void pop_back_utf8_char(std::string & line) {
+    static void pop_back_utf8_char(std::string & line) {
         if (line.empty()) {
             return;
         }
@@ -349,7 +352,7 @@ namespace console {
         line.erase(pos);
     }
 
-    bool readline_advanced(std::string & line, bool multiline_input) {
+    static bool readline_advanced(std::string & line, bool multiline_input) {
         if (out != stdout) {
             fflush(stdout);
         }
@@ -452,7 +455,7 @@ namespace console {
         return has_more;
     }
 
-    bool readline_simple(std::string & line, bool multiline_input) {
+    static bool readline_simple(std::string & line, bool multiline_input) {
 #if defined(_WIN32)
         std::wstring wline;
         if (!std::getline(std::wcin, wline)) {
