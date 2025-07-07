@@ -141,6 +141,8 @@ if (Vulkan_FOUND)
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/$<CONFIG>
                    -DCMAKE_INSTALL_BINDIR=.
                    -DCMAKE_BUILD_TYPE=$<CONFIG>
+                   -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+                   -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
                    ${VULKAN_SHADER_GEN_CMAKE_ARGS}
 
         BUILD_COMMAND   ${CMAKE_COMMAND} --build   . --config $<CONFIG>
